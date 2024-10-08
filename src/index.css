@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.prose {
+  @apply text-gray-300;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply text-white;
+}
+
+.prose strong {
+  @apply text-blue-400;
+}
+
+.prose a {
+  @apply text-blue-400 hover:text-blue-300;
+}
+
+.prose ul, .prose ol {
+  @apply my-4 pl-6;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-gray-700 pl-4 italic;
+}
+
+.prose code {
+  @apply bg-gray-700 rounded px-1 py-0.5;
+}
+
+.prose pre {
+  @apply bg-gray-700 rounded p-4 overflow-x-auto;
+}
