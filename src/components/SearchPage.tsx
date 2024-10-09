@@ -34,7 +34,7 @@ const SearchPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       <div className="w-full max-w-3xl text-center">
-        <h1 className="text-6xl font-bold mb-8 bg-gradient-to-r from-teal-300 via-blue-400 to-purple-400 text-transparent bg-clip-text animate-gradient">Discover Alpha</h1>
+        <h1 className="text-6xl font-bold mb-8 bg-gradient-to-r from-teal-300 via-blue-400 to-purple-400 text-transparent bg-clip-text animate-gradient">Vessu Vision</h1>
         <form onSubmit={handleSearch} className="w-full mb-8 relative">
           <div className="relative group">
             <input
