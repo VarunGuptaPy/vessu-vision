@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import SearchPage from './components/SearchPage'
 import ResultsPage from './components/ResultsPage'
+import 'katex/dist/katex.min.css'
 
 function App() {
   return (

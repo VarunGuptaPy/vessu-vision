@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white;
+}
+
 .prose {
-  @apply text-gray-300;
+  @apply text-slate-200;
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
@@ -11,11 +15,11 @@
 }
 
 .prose strong {
-  @apply text-blue-400;
+  @apply text-teal-300;
 }
 
 .prose a {
-  @apply text-blue-400 hover:text-blue-300;
+  @apply text-teal-300 hover:text-teal-200;
 }
 
 .prose ul, .prose ol {
@@ -27,13 +31,75 @@
 }
 
 .prose blockquote {
-  @apply border-l-4 border-gray-700 pl-4 italic;
+  @apply border-l-4 border-slate-700 pl-4 italic;
 }
 
 .prose code {
-  @apply bg-gray-700 rounded px-1 py-0.5;
+  @apply bg-slate-700 rounded px-1 py-0.5;
 }
 
 .prose pre {
-  @apply bg-gray-700 rounded p-4 overflow-x-auto;
+  @apply bg-slate-700 rounded p-4 overflow-x-auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradientFlow 5s ease infinite;
+}
+
+/* Modern scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}
+
+/* Custom gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-blue-400 to-purple-400;
+}
+
+/* Custom gradient button */
+.gradient-button {
+  @apply bg-gradient-to-r from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 text-slate-900 font-semibold py-2 px-4 rounded-full transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1;
+}
+
+/* Custom gradient background */
+.gradient-bg {
+  @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900;
+}
+
+/* Glowing effect */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(45, 212, 191, 0.5), 0 0 10px rgba(45, 212, 191, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(45, 212, 191, 0.8), 0 0 30px rgba(45, 212, 191, 0.5); }
+}
+
+.glow-effect {
+  animation: glow 2s ease-in-out infinite;
 }
