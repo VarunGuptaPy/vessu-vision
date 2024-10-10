@@ -2,82 +2,74 @@ import React, { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, RefreshCw, Search } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 
-interface SearchResult {
-  answer: string
-}
-
-const MAX_RETRIES = 3
-const RETRY_DELAY = 2000 // 2 seconds
-const TIMEOUT = 60000 // 60 seconds
-
-const fetchWithTimeout = (url: string, options: RequestInit, timeout = TIMEOUT) => {
-  return Promise.race([
-    fetch(url, options),
-    new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timed out')), timeout)
-    )
-  ]) as Promise<Response>
-}
-
 const ResultsPage: React.FC = () => {
-  const [result, setResult] = useState<SearchResult | null>(null)
+  const [result, setResult] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const [query, setQuery] = useState(searchParams.get('q') || '')
 
-  const fetchResults = async (retryAttempt = 0) => {
+  const fetchResults = async () => {
     setLoading(true)
     setError(null)
+    setResult('')
+
     try {
-      const apiUrl = `https://oevortex-webscout-api.hf.space/api/AI_search_google?q=${encodeURIComponent(query)}&model=gpt-4o-mini&max_results=10&safesearch=moderate&region=wt-wt&max_chars=6000&system_prompt=You%20are%20an%20advanced%20AI%20chatbot.%20Provide%20the%20best%20answer%20to%20the%20user%20based%20on%20Google%20search%20results.`
-      console.log(`Fetching results from: ${apiUrl}`)
-      
-      const response = await fetchWithTimeout(apiUrl, {
-        method: 'POST',
+      const response = await fetch(`https://abhaykoul-aisearchengineapi.hf.space/Search/pro?prompt=${encodeURIComponent(query)}&model=claude`, {
+        method: 'GET',
         headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}),
+          'accept': 'application/json'
+        }
       })
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
-      const data = await response.json()
-      console.log('API Response:', data)
-      
-      if (!data || !data.answer) {
-        throw new Error('Invalid response format')
+
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('ReadableStream not supported')
       }
-      
-      setResult(data)
-      setRetryCount(0)
+
+      const decoder = new TextDecoder()
+      let markdown = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+        lines.forEach(line => {
+          if (line.startsWith('data: ')) {
+            const content = line.slice(6).trim()
+            if (content && content !== '[DONE]') {
+              markdown += formatContent(content) + '\n\n'
+            }
+          }
+        })
+        setResult(markdown)
+      }
     } catch (error: any) {
       console.error('Error fetching results:', error)
-      let errorMessage = `An error occurred while fetching results: ${error.message || 'Unknown error'}`
-      if (error instanceof TypeError) {
-        errorMessage += '. This might be due to a network issue or CORS policy.'
-      }
-      if (retryAttempt < MAX_RETRIES) {
-        console.log(`Retrying... Attempt ${retryAttempt + 1} of ${MAX_RETRIES}`)
-        setTimeout(() => fetchResults(retryAttempt + 1), RETRY_DELAY * (retryAttempt + 1))
-        setRetryCount(retryAttempt + 1)
-      } else {
-        setError(`${errorMessage}. Please try again later.`)
-        setRetryCount(0)
-      }
+      setError(`An error occurred while fetching results: ${error.message || 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
+  }
+
+  const formatContent = (content: string): string => {
+    // Replace <i></i> with ** for bold in Markdown
+    content = content.replace(/<i>(.*?)<\/i>/g, '**$1**')
+    
+    // Remove 'data:' prefix if present
+    content = content.replace(/^data:\s*/, '')
+
+    // Convert <i></i> headers to Markdown headers
+    content = content.replace(/<i>(.*?)<\/i>/g, '### $1')
+
+    return content
   }
 
   useEffect(() => {
@@ -113,12 +105,13 @@ const ResultsPage: React.FC = () => {
           </div>
         </div>
         <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg p-8 mb-8 shadow-xl border border-gray-600">
-          {loading ? (
+          {loading && !result && (
             <div className="flex flex-col items-center justify-center">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-blue-400 text-lg font-semibold">Uncovering knowledge... {retryCount > 0 && `(Retry attempt ${retryCount})`}</p>
+              <p className="text-blue-400 text-lg font-semibold">Uncovering knowledge...</p>
             </div>
-          ) : error ? (
+          )}
+          {error && (
             <div className="text-center">
               <p className="text-red-500 mb-4 text-lg">{error}</p>
               <button
@@ -129,16 +122,20 @@ const ResultsPage: React.FC = () => {
                 Retry
               </button>
             </div>
-          ) : result ? (
-            <div className="prose prose-invert prose-lg max-w-none">
-              <ReactMarkdown
-                remarkPlugins={[remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-              >
-                {result.answer}
-              </ReactMarkdown>
-            </div>
-          ) : (
+          )}
+          {result && (
+            <ReactMarkdown
+              className="prose prose-invert prose-lg max-w-none"
+              components={{
+                a: ({ node, ...props }) => (
+                  <a {...props} className="text-blue-400 hover:text-blue-300" target="_blank" rel="noopener noreferrer" />
+                ),
+              }}
+            >
+              {result}
+            </ReactMarkdown>
+          )}
+          {!loading && !error && !result && (
             <p className="text-center text-lg">No discoveries found. Try a different query!</p>
           )}
         </div>
