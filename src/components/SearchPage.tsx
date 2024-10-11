@@ -2,21 +2,30 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Zap, X } from 'lucide-react'
 
-const SearchPage: React.FC = () => {
+interface SearchPageProps {
+  model: 'llama' | 'claude'
+}
+
+const SearchPage: React.FC<SearchPageProps> = ({ model }) => {
   const [query, setQuery] = useState('')
   const [showProPopup, setShowProPopup] = useState(false)
+  const [isProMode, setIsProMode] = useState(false)
   const navigate = useNavigate()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      navigate(`/results?q=${encodeURIComponent(query)}`)
+      const searchParams = new URLSearchParams({ q: query, model })
+      navigate(isProMode ? `/pro-results?${searchParams}` : `/results?${searchParams}`)
     }
   }
 
-  const showProComingSoon = () => {
-    setShowProPopup(true)
-    setTimeout(() => setShowProPopup(false), 3000)
+  const toggleProMode = () => {
+    setIsProMode(!isProMode)
+    if (!isProMode) {
+      setShowProPopup(true)
+      setTimeout(() => setShowProPopup(false), 3000)
+    }
   }
 
   const inspirationTopics = [
@@ -47,8 +56,12 @@ const SearchPage: React.FC = () => {
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
               <button
                 type="button"
-                onClick={showProComingSoon}
-                className="flex items-center space-x-1 px-3 py-1 rounded-full transition-all duration-300 bg-slate-700 text-slate-300 hover:bg-teal-500 hover:text-white"
+                onClick={toggleProMode}
+                className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-all duration-300 ${
+                  isProMode
+                    ? 'bg-gradient-to-r from-teal-400 to-blue-500 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-teal-500 hover:text-white'
+                }`}
               >
                 <Zap size={16} />
                 <span>Pro</span>
@@ -61,7 +74,7 @@ const SearchPage: React.FC = () => {
         </form>
         {showProPopup && (
           <div className="fixed top-4 right-4 bg-gradient-to-r from-teal-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in flex items-center">
-            <span className="mr-2">Pro mode coming soon!</span>
+            <span className="mr-2">Pro mode activated!</span>
             <button onClick={() => setShowProPopup(false)} className="text-white hover:text-slate-200">
               <X size={18} />
             </button>

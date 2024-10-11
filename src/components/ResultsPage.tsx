@@ -4,13 +4,32 @@ import { ArrowLeft, RefreshCw, Search } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import 'katex/dist/katex.min.css'
 
-const ResultsPage: React.FC = () => {
+interface ResultsPageProps {
+  model: 'llama' | 'claude'
+}
+
+const ResultsPage: React.FC<ResultsPageProps> = ({ model }) => {
   const [result, setResult] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const [query, setQuery] = useState(searchParams.get('q') || '')
+  const [remainingClaudeSearches, setRemainingClaudeSearches] = useState(3)
+
+  useEffect(() => {
+    const storedSearches = localStorage.getItem('claudeSearches')
+    const storedDate = localStorage.getItem('claudeSearchDate')
+    const today = new Date().toDateString()
+
+    if (storedDate !== today) {
+      localStorage.setItem('claudeSearches', '3')
+      localStorage.setItem('claudeSearchDate', today)
+      setRemainingClaudeSearches(3)
+    } else if (storedSearches) {
+      setRemainingClaudeSearches(parseInt(storedSearches))
+    }
+  }, [])
 
   const fetchResults = async () => {
     setLoading(true)
@@ -18,7 +37,20 @@ const ResultsPage: React.FC = () => {
     setResult('')
 
     try {
-      const response = await fetch(`https://abhaykoul-aisearchengineapi.hf.space/Search/pro?prompt=${encodeURIComponent(query)}&model=claude`, {
+      let selectedModel = model
+      if (model === 'claude') {
+        if (remainingClaudeSearches > 0) {
+          setRemainingClaudeSearches(prev => {
+            const newValue = prev - 1
+            localStorage.setItem('claudeSearches', newValue.toString())
+            return newValue
+          })
+        } else {
+          selectedModel = 'llama'
+        }
+      }
+
+      const response = await fetch(`https://abhaykoul-aisearchengineapi.hf.space/Search/pro?prompt=${encodeURIComponent(query)}&model=${selectedModel}`, {
         method: 'GET',
         headers: {
           'accept': 'application/json'
@@ -60,15 +92,9 @@ const ResultsPage: React.FC = () => {
   }
 
   const formatContent = (content: string): string => {
-    // Replace <i></i> with ** for bold in Markdown
     content = content.replace(/<i>(.*?)<\/i>/g, '**$1**')
-    
-    // Remove 'data:' prefix if present
     content = content.replace(/^data:\s*/, '')
-
-    // Convert <i></i> headers to Markdown headers
     content = content.replace(/<i>(.*?)<\/i>/g, '### $1')
-
     return content
   }
 
@@ -76,7 +102,7 @@ const ResultsPage: React.FC = () => {
     if (query) {
       fetchResults()
     }
-  }, [query])
+  }, [query, model])
 
   const handleRetry = () => {
     fetchResults()
@@ -90,6 +116,11 @@ const ResultsPage: React.FC = () => {
             <ArrowLeft className="mr-2" size={20} />
             Back to Search
           </Link>
+          {model === 'claude' && (
+            <span className="text-sm text-gray-400">
+              Remaining Claude searches: {remainingClaudeSearches}
+            </span>
+          )}
         </div>
         <div className="mb-8">
           <div className="relative">
