@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "axios": "^1.7.7",
+    "firebase": "^10.14.1",
     "katex": "^0.16.9",
     "lucide-react": "^0.344.0",
     "openai": "^4.67.3",
@@ -19,6 +20,7 @@
     "react-dom": "^18.3.1",
     "react-katex": "^3.0.1",
     "react-markdown": "^9.0.1",
+    "react-razorpay": "^3.0.1",
     "react-router-dom": "^6.22.3",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^7.0.0",
