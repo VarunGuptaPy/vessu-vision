@@ -87,6 +87,7 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
 
     return content;
   };
+  const navigate = useNavigate();
 
   useEffect(() => {
     getDoc(doc(db, "users", uid)).then((value) => {
@@ -100,8 +101,7 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
         navigate("/");
       }
     });
-  }, []);
-  const navigate = useNavigate();
+  }, [location.search]);
 
   const handleRetry = () => {
     fetchResults();
@@ -119,7 +119,6 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
         model: model,
       });
       navigate(`/pro-results?${searchParams}&uid=${uid}`);
-      window.location.reload();
     }
   };
   return (
@@ -138,7 +137,7 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
             <span>Pro</span>
           </div>
         </div>
-        <div className="mb-8" onSubmit={handleSearch}>
+        <div className="mb-8">
           <div className="relative">
             <input
               type="text"

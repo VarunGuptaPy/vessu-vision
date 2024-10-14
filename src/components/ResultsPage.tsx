@@ -53,18 +53,16 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
               uid,
             });
             navigate(`/results?${searchParams}`);
-            window.location.reload();
           } else if (model === "llama") {
             updateDoc(doc(db, "users", uid), { freeLlama: increment(-1) });
           }
           setRemainingLlamaSearches(data.freeLlama - 1);
         } else {
           navigate("/");
-          window.location.reload();
         }
       });
     }
-  }, []);
+  }, [location.search]);
 
   const fetchResults = async () => {
     setLoading(true);
@@ -137,14 +135,13 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
     if (query.trim()) {
       const searchParams = new URLSearchParams({ q: query, model, uid });
       navigate(`/results?${searchParams}`);
-      window.location.reload();
     }
   };
   useEffect(() => {
     if (query) {
       fetchResults();
     }
-  }, []);
+  }, [location.search]);
 
   const handleRetry = () => {
     fetchResults();
