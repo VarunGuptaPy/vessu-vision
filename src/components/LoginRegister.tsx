@@ -50,6 +50,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ onClose }) => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      onClose();
       alert("User logged in successfully!");
     } catch (error: any) {
       console.error("Error logging in:", error.message);

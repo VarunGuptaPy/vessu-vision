@@ -57,7 +57,7 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
           } else if (model === "llama") {
             updateDoc(doc(db, "users", uid), { freeLlama: increment(-1) });
           }
-          setRemainingLlamaSearches(data.freeLlaama - 1);
+          setRemainingLlamaSearches(data.freeLlama - 1);
         } else {
           navigate("/");
           window.location.reload();

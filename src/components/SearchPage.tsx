@@ -146,9 +146,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ model }) => {
           </div>
           <button
             onClick={() => handleLogout()}
-            className="flex items-center space-x-1 text-sky-400 hover:text-sky-300"
+            className="flex items-center space-x-1 text-sky-400 hover:text-sky-300 pt-3"
           >
-            <User size={20} />
             <span>Logout</span>
           </button>
         </div>
