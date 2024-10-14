@@ -3,6 +3,8 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, RefreshCw, Search, Zap } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import "katex/dist/katex.min.css";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 interface SearchPageProps {
   model: "claude" | "llama";
 }
@@ -14,6 +16,7 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [query, setQuery] = useState(searchParams.get("q") || "");
+  const uid = searchParams.get("uid");
   // const model = props.;
   const fetchResults = async () => {
     setLoading(true);
@@ -86,9 +89,17 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
   };
 
   useEffect(() => {
-    if (query) {
-      fetchResults();
-    }
+    getDoc(doc(db, "users", uid)).then((value) => {
+      if (value.exists()) {
+        if (value.data().isPro && query) {
+          fetchResults();
+        } else {
+          navigate("/");
+        }
+      } else {
+        navigate("/");
+      }
+    });
   }, []);
   const navigate = useNavigate();
 
@@ -103,8 +114,11 @@ const ResultsProPage: React.FC<SearchPageProps> = ({ model }) => {
   );
   const handleSearch = () => {
     if (query.trim()) {
-      const searchParams = new URLSearchParams({ q: query, model });
-      navigate(`/pro-results?${searchParams}`);
+      const searchParams = new URLSearchParams({
+        q: query,
+        model: model,
+      });
+      navigate(`/pro-results?${searchParams}&uid=${uid}`);
       window.location.reload();
     }
   };
