@@ -164,7 +164,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ model }) => {
         <h1 className="text-6xl font-bold mb-8 bg-gradient-to-r from-teal-300 via-blue-400 to-purple-400 text-transparent bg-clip-text animate-gradient">
           Vessu Vision
         </h1>
-        <form onSubmit={handleSearch} className="w-3/5 mb-8 relative">
+        <form onSubmit={handleSearch} className="lg:w-3/5 w-full mb-8 relative">
           <div className="relative group">
             <input
               type="text"
