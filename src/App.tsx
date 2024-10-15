@@ -18,7 +18,7 @@ function App() {
           <Route path="/" element={<SearchPage model={model} />} />
           <Route
             path="/results"
-            element={<ResultsPage model={model} />}
+            element={<ResultsPage model={model} setModel={setModel} />}
           />
           <Route path="/pricing-page" element={<PricingPage />} />
           <Route

@@ -14,9 +14,10 @@ import { db } from "../firebase";
 
 interface ResultsPageProps {
   model: "claude" | "llama";
+  setModel: (model: "llama" | "claude") => void;
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = () => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ model, setModel }) => {
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,6 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
   const searchParams = new URLSearchParams(location.search);
   const [query, setQuery] = useState(searchParams.get("q") || "");
   const [remainingLlamaSearches, setRemainingLlamaSearches] = useState(0);
-  const [model, setModel] = useState(searchParams.get("model") || "");
   const uid = searchParams.get("uid") || "";
   const navigate = useNavigate();
   useEffect(() => {
@@ -52,6 +52,7 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
               model: "claude",
               uid,
             });
+            setModel("claude");
             navigate(`/results?${searchParams}`);
           } else if (model === "llama") {
             updateDoc(doc(db, "users", uid), { freeLlama: increment(-1) });
@@ -158,7 +159,7 @@ const ResultsPage: React.FC<ResultsPageProps> = () => {
             <ArrowLeft className="mr-2" size={20} />
             Back to Search
           </Link>
-          {model === "llama" && (
+          {searchParams.get("model") === "llama" && (
             <span className="text-sm text-gray-400">
               Remaining Llama searches: {remainingLlamaSearches}
             </span>
