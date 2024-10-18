@@ -61,7 +61,7 @@ const PricingPage: React.FC = () => {
   const plans = [
     {
       name: "monthly",
-      price: "$5.99",
+      price: "$3.99",
       features: [
         "Unlimited access to llama search",
         "No boundation on usage",
@@ -70,7 +70,7 @@ const PricingPage: React.FC = () => {
     },
     {
       name: "Lifetime",
-      price: "$99.99",
+      price: "$39.99",
       features: [
         "Unlimited access to llama search",
         "No boundation on usage",
@@ -99,7 +99,7 @@ const PricingPage: React.FC = () => {
               className="w-full py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600 transition-colors"
               onClick={() =>
                 handlePayment(
-                  index == 0 ? 599 : 9999,
+                  index == 0 ? 399 : 3999,
                   index == 0 ? false : true
                 )
               }
